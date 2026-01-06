@@ -16,7 +16,7 @@ source ./utils.sh
 #
 # ----------------------------- USER SETTINGS -------------------------------- #
 API_KEY=$(cat apikey.txt)
-BASE_URL="https://trmnl.app"
+BASE_URL="http://192.168.1.80:2300"
 RSSI="0"
 USER_AGENT="trmnl-display/0.1.1"
 DEBUG_MODE=false  # Set to true to enable debug messages, false to disable
@@ -26,8 +26,10 @@ TMP_DIR="/tmp/trmnl-kindle"
 mkdir -p "$TMP_DIR"
 
 # Coordinates for displaying the PNG in *pixels*
-DISPLAY_X=75
-DISPLAY_Y=25
+#DISPLAY_X=75
+#DISPLAY_Y=25
+DISPLAY_X=5
+DISPLAY_Y=5
 
 # Size of the PNG in *pixels*
 PNG_WIDTH=$(get_kindle_height)
@@ -78,6 +80,7 @@ while true; do
     curl -s \
       -H "access-token: $API_KEY" \
       -H "battery-voltage: $BATTERY_VOLTAGE" \
+      -H "ID: B4:7C:9C:9A:91:C6" \
       -H "png-width: $PNG_WIDTH" \
       -H "png-height: $PNG_HEIGHT" \
       -H "rssi: $RSSI" \
@@ -98,7 +101,8 @@ while true; do
   eips_debug "JSON: ${SHORT_JSON}..."
 
   # 3) Parse JSON (naive sed approach)
-  IMAGE_URL=$(echo "$RESPONSE" | sed -n 's/.*"image_url":"\([^"]*\)".*/\1/p' | sed 's/\\u0026/\&/g')
+  #IMAGE_URL=$(echo "$RESPONSE" | sed -n 's/.*"image_url":"\([^"]*\)".*/\1/p' | sed 's/\\u0026/\&/g')
+  IMAGE_URL=$(echo "$RESPONSE" | jq -r .image_url)
   eips_debug "ORIGINAL_URL: ${IMAGE_URL}"
 
   REFRESH_RATE=$(echo "$RESPONSE" | sed -n 's/.*"refresh_rate":\([^,}]*\).*/\1/p')
@@ -139,9 +143,9 @@ while true; do
   eips_debug "Downloading image..."
 
   # Download the image directly from IMAGE_URL
-  curl -s -o "$IMAGE_PATH" \
+  curl -s -o $IMAGE_PATH \
     -A "$USER_AGENT" \
-    "$IMAGE_URL"
+    $IMAGE_URL
 
   # Check download success
   if [ ! -s "$IMAGE_PATH" ]; then
