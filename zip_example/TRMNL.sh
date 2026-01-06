@@ -22,7 +22,7 @@ USER_AGENT="trmnl-display/0.1.1"
 DEBUG_MODE=false  # Set to true to enable debug messages, false to disable
 
 # Temporary folder to hold downloaded files
-TMP_DIR="/tmp/trmnl-kindle"
+TMP_DIR="/mnt/us/trmnl-kindle"
 mkdir -p "$TMP_DIR"
 
 # Coordinates for displaying the PNG in *pixels*
